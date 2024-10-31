@@ -1,0 +1,87 @@
+/* Agregado el estilo para centrar */
+.center-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Distribuye los elementos uniformemente */
+    width: auto; /* Ajuste para que no ocupe todo el ancho */
+}
+
+.log {
+    display: inline-block; /* En lugar de float, usa inline-block */
+    margin-right: 1rem;
+    width: 100px;
+}
+
+.container {
+    margin: auto;
+}
+
+.no-publicaciones {
+    color: white;
+}
+
+.max-w-15 {
+    max-width: 15rem;
+}
+
+.h-15 {
+    height: 15rem;
+}
+
+.glide__slide img {
+    width: 100%;
+    height: auto;
+}
+
+.publicaciones {
+    margin-top: 2rem;
+}
+
+.publicacion {
+    max-width: 100%;
+    margin-bottom: 2rem;
+}
+
+.navbar1 {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #182030;
+    z-index: 999;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 70px;
+}
+
+.grande {
+    padding-top: 40px !important;
+    padding-bottom: 20px !important;
+    font-size: 25px !important;
+    color: white !important;
+    text-align: center !important;
+}
+
+.nav-link {
+    font-size: 1.2rem;  /* Aumentar o ajustar el tamaño de la fuente */
+    font-weight: bold;  /* Otras opciones: normal, lighter */
+    color: #333;        /* Asegúrate de que el color sea más visible */
+    margin-left: 10px;  /* Añadir espacio entre el icono y el texto */
+}
+
+.nav-item {
+    padding: 10px 15px; /* Aumentar el espaciado alrededor del texto "Panel" */
+    display: flex;
+    align-items: center; /* Alinear verticalmente el texto y el icono */
+}
+
+/* Resto del CSS... */
