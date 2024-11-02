@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 import sessions.PublicacionesFacade;
 import sessions.UsersFacade;
+import jakarta.servlet.annotation.MultipartConfig;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -22,8 +23,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -36,23 +40,26 @@ import java.util.Date;
 @WebServlet(name = "Manejador",
         loadOnStartup = 1,
         urlPatterns = {
-            "/SolicitarDatosPublicacion",
             "/CrearPublicacion",
             "/ListarPublicaciones",
-            "/SolicitarDatosUsuario",
             "/AgregarUsuario",
             "/ListarUsuarios",
             "/index", // Ruta para la página principal
             "/buscar",
             "/Login", // Agrega la ruta para login
             "/Register", // Agrega la ruta para registro
-            "/ResetPassword", // Agrega la ruta para restablecer contraseña
             "/Dashboard", // Ruta para el panel de control
             "/AdminPanel", // Nuevo: Panel de administrador para ver publicaciones
             "/AdminListarUsuarios", // Nuevo: Ver listado de usuarios
-            "/AceptarCuentas" // Nuevo: Aceptar nuevas cuentas de usuarios
+            "/AceptarCuentas",
+            "/Logout",
+            "/edit",
+            "/deletePublicacion",
+            "/showPublicacion"
+
         }
 )
+@MultipartConfig
 public class Manejador extends HttpServlet {
 
     @EJB
@@ -85,6 +92,100 @@ public class Manejador extends HttpServlet {
                     url = "/index.jsp"; // Ajustar ruta si es necesario
                     break;
 
+                case "/Logout":
+                    HttpSession session = request.getSession(false); // Obtener la sesión actual, si existe
+                    if (session != null) {
+                        session.invalidate(); // Invalidar la sesión
+                    }
+                    request.getRequestDispatcher("/vista/layouts/welcome.jsp").forward(request, response);
+                    break;
+
+                case "/edit":
+    session = request.getSession();
+    Users usuario = (Users) session.getAttribute("usuario"); // Obtener el usuario completo de sesión
+    Long userId = usuario.getId(); // Extraer solo el ID
+    List<Publicaciones> publicaciones = publicacionesF.obtenerPublicacionesPorUsuario(userId);
+    request.setAttribute("publicaciones", publicaciones);
+    request.setAttribute("usuarioId", userId); // Pasar usuarioId para el JSP
+    request.getRequestDispatcher("edit.jsp").forward(request, response);
+    break;
+
+                // Mostrar una publicación específica para editar
+                case "/showPublicacion":
+                    if (request.getMethod().equalsIgnoreCase("POST")) {
+                        Long id = Long.parseLong(request.getParameter("id"));
+                        Publicaciones publicacion = publicacionesF.obtenerPublicacionPorId(id);
+
+                        // Obtener nuevos valores de la solicitud
+                        String titulo = request.getParameter("titulo");
+                        String contenido = request.getParameter("contenido");
+                        String imagen = publicacion.getImagen(); // Mantener la imagen actual en caso de no cargar una nueva
+
+                        try {
+                            // Manejo de carga de imagen
+                            Part imagenPart = request.getPart("imagen");
+                            if (imagenPart != null && imagenPart.getSize() > 0) {
+                                String nombreImagen = Paths.get(imagenPart.getSubmittedFileName()).getFileName().toString();
+
+                                // Definir el directorio de carga de imagen
+                                String rutaBase = "C:/uploads"; // Puedes definir una ruta fija
+                                File uploads = new File(rutaBase);
+
+                                // Crear el directorio si no existe
+                                if (!uploads.exists()) {
+                                    uploads.mkdirs();
+                                }
+
+                                // Guardar la imagen en la carpeta de carga manualmente
+                                File file = new File(uploads, nombreImagen);
+                                try (InputStream input = imagenPart.getInputStream(); FileOutputStream output = new FileOutputStream(file)) {
+                                    byte[] buffer = new byte[1024];
+                                    int bytesRead;
+                                    while ((bytesRead = input.read(buffer)) != -1) {
+                                        output.write(buffer, 0, bytesRead);
+                                    }
+                                }
+                                imagen = nombreImagen; // Usar la nueva imagen cargada
+                            }
+
+                            // Actualizar la publicación
+                            publicacion.setTitulo(titulo);
+                            publicacion.setContenido(contenido);
+                            publicacion.setImagen(imagen); // Actualizar la imagen (o mantener la anterior si no se cargó una nueva)
+                            publicacion.setUpdatedAt(new Date());
+
+                            publicacionesF.edit(publicacion); // Método que deberías implementar en el facade para actualizar la publicación
+
+                            // Redirigir a la misma página de visualización de la publicación actualizada
+                            response.sendRedirect(request.getContextPath() + "/showPublicacion?id=" + publicacion.getId());
+                            return;
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            request.setAttribute("error", "Hubo un problema al actualizar la publicación. " + e.getMessage());
+                            request.getRequestDispatcher("/vista/publicaciones/show.jsp").forward(request, response);
+                        }
+                    } else {
+                        Long id = Long.parseLong(request.getParameter("id"));
+                        Publicaciones publicacion = publicacionesF.obtenerPublicacionPorId(id);
+                        request.setAttribute("publicacion", publicacion);
+                        request.getRequestDispatcher("/vista/publicaciones/show.jsp").forward(request, response);
+                    }
+                    break;
+
+                case "/deletePublicacion":
+                    Long idEliminar = Long.parseLong(request.getParameter("id"));
+                    publicacionesF.eliminarPublicacion(idEliminar);
+                    session = request.getSession();
+                    session.setAttribute("success", "Publicación eliminada con éxito.");
+
+                    // Recargar la lista de publicaciones después de eliminar
+                    List<Publicaciones> publicacionesActualizadas = publicacionesF.obtenerTodasLasPublicaciones();
+                    session.setAttribute("publicaciones", publicacionesActualizadas);
+
+                // Redireccionar a edit.jsp (no es necesario ya que estás usando fetch para eliminar)
+                // response.sendRedirect(request.getContextPath() + "/vista/publicaciones/edit.jsp");
+                // return;
                 case "/buscar":
                     String termino = request.getParameter("nombre");
                     if (termino != null && !termino.trim().isEmpty()) {
@@ -99,39 +200,90 @@ public class Manejador extends HttpServlet {
 
                 case "/CrearPublicacion":
                     if (request.getMethod().equalsIgnoreCase("POST")) {
-                        // Obtener el ID del usuario desde la sesión
                         Long usuarioId = (Long) request.getSession().getAttribute("usuarioId");
+                        System.out.println("Usuario ID: " + usuarioId); // Log del ID de usuario
+
                         if (usuarioId == null) {
                             request.setAttribute("error", "Debes estar autenticado para crear una publicación.");
-                            request.getRequestDispatcher("vista/publicaciones/create.jsp").forward(request, response);
-                            return; // Salir del método si el usuario no está autenticado
+                            String ruta = "/vista/publicaciones/create.jsp";
+                            request.getRequestDispatcher(ruta).forward(request, response);
+                            return;
                         }
 
-                        // Obtener los parámetros del formulario
                         String titulo = request.getParameter("titulo");
                         String contenido = request.getParameter("contenido");
+                        String imagen = ""; // Inicializamos como vacío
+                        System.out.println("Título: " + titulo); // Log del título
+                        System.out.println("Contenido: " + contenido); // Log del contenido
+
                         try {
-                            // Crear una nueva instancia de Publicacion
+                            // Manejo de carga de imagen
+                            Part imagenPart = request.getPart("imagen");
+                            if (imagenPart != null && imagenPart.getSize() > 0) {
+                                String nombreImagen = Paths.get(imagenPart.getSubmittedFileName()).getFileName().toString();
+                                System.out.println("Nombre de la imagen: " + nombreImagen); // Log del nombre de la imagen
+
+                                // Definir el directorio de carga de imagen
+                                String rutaBase = "C:/uploads"; // Puedes definir una ruta fija
+                                File uploads = new File(rutaBase);
+                                System.out.println("Ruta de carga definida: " + uploads.getAbsolutePath()); // Log de la ruta de carga
+
+                                // Crear el directorio si no existe
+                                if (!uploads.exists()) {
+                                    boolean dirCreated = uploads.mkdirs();
+                                    System.out.println("¿Directorio creado? " + dirCreated); // Log de creación del directorio
+                                }
+
+                                // Guardar la imagen en la carpeta de carga manualmente
+                                File file = new File(uploads, nombreImagen);
+                                System.out.println("Ruta completa para guardar la imagen: " + file.getAbsolutePath()); // Log de la ruta completa
+
+                                try (InputStream input = imagenPart.getInputStream(); FileOutputStream output = new FileOutputStream(file)) {
+                                    byte[] buffer = new byte[1024];
+                                    int bytesRead;
+                                    while ((bytesRead = input.read(buffer)) != -1) {
+                                        output.write(buffer, 0, bytesRead);
+                                    }
+                                }
+                                imagen = nombreImagen;
+                                System.out.println("Imagen guardada: " + imagen); // Log de la imagen guardada
+                            } else {
+                                System.out.println("No se ha recibido ninguna imagen o el tamaño es 0."); // Log si no hay imagen
+                            }
+
+                            // Crear la publicación y almacenar la ruta de la imagen
                             Publicaciones nuevaPublicacion = new Publicaciones();
-                            nuevaPublicacion.setId(usuarioId);
                             nuevaPublicacion.setTitulo(titulo);
                             nuevaPublicacion.setContenido(contenido);
-                            nuevaPublicacion.setImagen(null);
+                            nuevaPublicacion.setImagen(imagen); // Usar el nombre de la imagen o cadena vacía
                             nuevaPublicacion.setCreatedAt(new Date());
                             nuevaPublicacion.setUpdatedAt(new Date());
 
-                            // Persistir la publicación utilizando el facade
-                            publicacionesF.create(nuevaPublicacion); // Método en PublicacionesFacade para crear la publicación
+                            usuario = usersF.find(usuarioId);
+                            nuevaPublicacion.setUserId(usuario);
 
-                            // Redirigir a la página de éxito
-                            response.sendRedirect("vista/publicaciones/indexP.jsp"); // Asegúrate de redirigir a una página de éxito
+                            publicacionesF.create(nuevaPublicacion);
+                            System.out.println("Publicación creada con éxito."); // Log de éxito
+
+                            // Redirigir al dashboard
+                            url = request.getContextPath() + "/vista/layouts/dashboard.jsp";
+                            response.sendRedirect(url);
+                            return;
+
+                        } catch (jakarta.validation.ConstraintViolationException e) {
+                            e.printStackTrace(); // Log de excepción de validación
+                            request.setAttribute("error", "Hubo un problema al guardar la publicación. Revise los datos ingresados.");
+                            url = "/vista/publicaciones/create.jsp";
+                            request.getRequestDispatcher(url).forward(request, response);
 
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            e.printStackTrace(); // Log de cualquier otra excepción
                             request.setAttribute("error", "Hubo un problema al guardar la publicación. " + e.getMessage());
-                            request.getRequestDispatcher("vista/publicaciones/create.jsp").forward(request, response); // Redirigir a la página de creación en caso de error
+                            url = "/vista/publicaciones/create.jsp";
+                            request.getRequestDispatcher(url).forward(request, response);
                         }
                     }
+                    break;
 
                 case "/ListarPublicaciones":
                     List<Publicaciones> publicacionesList = publicacionesF.findAll();
@@ -139,22 +291,6 @@ public class Manejador extends HttpServlet {
                     url = "/vista/publicaciones/listarPublicaciones.jsp"; // Ajustar ruta si es necesario
                     break;
 
-                case "/SolicitarDatosUsuario":
-                    // Lógica para solicitar datos de un usuario
-                    url = "/vista/auth/solicitarDatosUsuario.jsp"; // Ajustar ruta si es necesario
-                    break;
-
-                /*case "/AgregarUsuario":
-                    String username = request.getParameter("username");
-                    String email = request.getParameter("email");
-
-                    Users usuario = new Users();
-                    usuario.setNombre(username);
-                    usuario.setEmail(email);
-
-                    usersF.create(usuario);
-                    url = "index"; // Redirige a la página principal o lista
-                    break;*/
                 case "/ListarUsuarios":
                     List<Users> listaUsuarios = usersF.findAll();
                     request.setAttribute("usuarios", listaUsuarios);
@@ -244,10 +380,6 @@ public class Manejador extends HttpServlet {
                         request.setAttribute("error", "Hubo un problema al registrar el usuario.");
                         url = "/vista/auth/register.jsp"; // Asegúrate de que rediriges a la página correcta en caso de error
                     }
-                    break;
-
-                case "/ResetPassword":
-                    url = "/vista/auth/reset-password.jsp"; // Ruta para restablecer contraseña
                     break;
 
                 case "/Dashboard":

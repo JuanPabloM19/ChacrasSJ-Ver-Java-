@@ -1,3 +1,7 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package sessions;
 
 import entidades.Users;
@@ -8,6 +12,10 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import java.util.List;
 
+/**
+ *
+ * @author Juan Pablo
+ */
 @Stateless
 public class UsersFacade extends AbstractFacade<Users> {
 
@@ -41,5 +49,4 @@ public class UsersFacade extends AbstractFacade<Users> {
         return em.createQuery("SELECT u FROM Users u WHERE u.bloqueado = true", Users.class)
                 .getResultList();
     }
-
 }

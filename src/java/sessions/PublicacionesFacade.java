@@ -5,16 +5,14 @@
 package sessions;
 
 import entidades.Publicaciones;
+import entidades.Users;
 import jakarta.ejb.Stateless;
 import jakarta.ejb.TransactionAttribute;
 import jakarta.ejb.TransactionAttributeType;
-import jakarta.ejb.TransactionManagement;
-import jakarta.ejb.TransactionManagementType;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
-import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintViolationException;
 import java.util.List;
 
 /**
@@ -22,7 +20,6 @@ import java.util.List;
  * @author Juan Pablo
  */
 @Stateless
-@TransactionManagement(TransactionManagementType.CONTAINER)
 public class PublicacionesFacade extends AbstractFacade<Publicaciones> {
 
     @PersistenceContext(unitName = "ChacrasSJPU")
@@ -72,6 +69,50 @@ public class PublicacionesFacade extends AbstractFacade<Publicaciones> {
 
     public List<Publicaciones> findAllPublicaciones() {
         return em.createNamedQuery("Publicaciones.findAll", Publicaciones.class).getResultList();
+    }
+
+    public void create(Publicaciones publicaciones) {
+        try {
+            // Supongamos que tienes acceso al EntityManager
+            Users user = em.find(Users.class, publicaciones.getUserId().getId());
+            publicaciones.setUserId(user); // Asegúrate de asignar el objeto User a la publicación
+
+            em.persist(publicaciones);
+        } catch (ConstraintViolationException e) {
+            // Manejo de la excepción
+        } catch (Exception e) {
+            // Manejo de la excepción
+        }
+    }
+
+    public List<Publicaciones> obtenerPublicacionesPorUsuario(Long userId) {
+        TypedQuery<Publicaciones> query = em.createQuery(
+                "SELECT p FROM Publicaciones p WHERE p.userId.id = :userId", Publicaciones.class);
+        query.setParameter("userId", userId);
+        return query.getResultList();
+    }
+
+    public void eliminarPublicacion(Long id) {
+        Publicaciones publicacion = em.find(Publicaciones.class, id);
+        if (publicacion != null) {
+            em.remove(publicacion);
+        }
+    }
+
+    public Publicaciones obtenerPublicacionPorId(Long id) {
+        return em.find(Publicaciones.class, id);
+    }
+
+    public void edit(Publicaciones publicacion) {
+        if (publicacion == null) {
+            throw new IllegalArgumentException("La publicación no puede ser nula");
+        }
+        try {
+            em.merge(publicacion); // Utiliza merge para actualizar la entidad
+        } catch (Exception e) {
+            System.err.println("Error updating publication: " + e.getMessage());
+            throw e; // Propagar la excepción
+        }
     }
 
 }

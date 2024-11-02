@@ -58,7 +58,7 @@
                     <!-- Dropdown content -->
                     <div id="dropdownMenu" class="hidden absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-1">
                         <a href="${pageContext.request.contextPath}/vista/layouts/profile.jsp" class="block px-4 py-2 text-sm text-gray-700">Perfil</a>
-                        <form method="POST" action="LogoutServlet">
+                        <form method="POST" action="${pageContext.request.contextPath}/Logout">
                             <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-700">Cerrar sesión</button>
                         </form>
                     </div>
@@ -117,7 +117,7 @@
                 <a href="profile.jsp" class="block px-4 py-2 text-base font-medium text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-900 rounded-md">
                     Perfil
                 </a>
-                <form method="POST" action="LogoutServlet">
+                <form method="POST" action="${pageContext.request.contextPath}/Logout">
                     <button type="submit" class="block w-full text-left px-4 py-2 text-base font-medium text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-900">
                         Cerrar sesión
                     </button>

@@ -299,5 +299,5 @@ public class Users implements Serializable {
     public String toString() {
         return "entidades.Users[ id=" + id + " ]";
     }
-
+    
 }

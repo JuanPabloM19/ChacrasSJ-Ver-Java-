@@ -11,7 +11,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
@@ -35,40 +34,47 @@ import java.util.Date;
     @NamedQuery(name = "Publicaciones.findAll", query = "SELECT p FROM Publicaciones p"),
     @NamedQuery(name = "Publicaciones.findById", query = "SELECT p FROM Publicaciones p WHERE p.id = :id"),
     @NamedQuery(name = "Publicaciones.findByTitulo", query = "SELECT p FROM Publicaciones p WHERE p.titulo = :titulo"),
+    @NamedQuery(name = "Publicaciones.findByContenido", query = "SELECT p FROM Publicaciones p WHERE p.contenido = :contenido"),
     @NamedQuery(name = "Publicaciones.findByImagen", query = "SELECT p FROM Publicaciones p WHERE p.imagen = :imagen"),
     @NamedQuery(name = "Publicaciones.findByCreatedAt", query = "SELECT p FROM Publicaciones p WHERE p.createdAt = :createdAt"),
     @NamedQuery(name = "Publicaciones.findByUpdatedAt", query = "SELECT p FROM Publicaciones p WHERE p.updatedAt = :updatedAt")})
 public class Publicaciones implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id", nullable = false)
     private Long id;
+
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 255)
     @Column(name = "titulo", nullable = false, length = 255)
     private String titulo;
+
     @Basic(optional = false)
     @NotNull
-    @Lob
-    @Size(min = 1, max = 65535)
-    @Column(name = "contenido", nullable = false, length = 65535)
+    @Size(min = 1, max = 255)
+    @Column(name = "contenido", nullable = false, length = 255)
     private String contenido;
+
     @Size(max = 255)
     @Column(name = "imagen", length = 255)
     private String imagen;
+
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
+
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
+
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     @ManyToOne(optional = false)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private Users userId; // Relación ManyToOne con Users
+    private Users userId;
 
     public Publicaciones() {
     }
@@ -83,7 +89,6 @@ public class Publicaciones implements Serializable {
         this.contenido = contenido;
     }
 
-    // Constructor vacío y otros constructores...
     public Long getId() {
         return id;
     }

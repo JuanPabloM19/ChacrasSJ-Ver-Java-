@@ -1,7 +1,14 @@
+<%@page import="java.io.InputStreamReader"%>
+<%@page import="java.io.BufferedReader"%>
+<%@page import="java.net.HttpURLConnection"%>
+<%@page import="java.net.URL"%>
 <%@page import="entidades.Publicaciones"%>
 <%@page import="java.net.URLEncoder"%>
 <%@page import="java.util.List"%>
 <%@page language="java" contentType="text/html; charset=utf-8" pageEncoding="UTF-8"%>
+<%@ page import="java.nio.file.Files, java.util.Base64, java.io.File" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
 
 <!DOCTYPE html>
 <html lang="${pageContext.request.locale.language}">
@@ -78,50 +85,18 @@
                     <h2 class="text-xl font-semibold mb-4">Resultados de la búsqueda para "<%= termino%>"</h2>
                     <% } %>
 
-                    <% List<?> ultimasPublicaciones = (List<?>) request.getAttribute("ultimasPublicaciones");
-                        if (ultimasPublicaciones != null && !ultimasPublicaciones.isEmpty()) { %>
-                    <h1 class="grande">Últimas Publicaciones</h1>
-                    <div class="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-5">
-                        <% for (Object obj : ultimasPublicaciones) {
-                                Publicaciones publicacion = (Publicaciones) obj;%>
-                        <div class="min-h-max flex items-center justify-center">
-                            <div class="container mx-auto text-center">
-                                <div class="max-w-sm mx-auto mb-8 bg-white rounded-lg overflow-hidden shadow-md">
-                                    <img class="w-full h-32 object-cover" src="data:image/jpeg;base64,<%= publicacion.getImagen()%>" alt="Imagen de la publicación">
-                                    <div class="p-4">
-                                        <div class="text-gray-900 font-bold text-xl mb-2"><%= publicacion.getTitulo().substring(0, Math.min(50, publicacion.getTitulo().length()))%></div>
-                                        <p class="text-gray-700 text-base"><%= publicacion.getContenido().substring(0, Math.min(150, publicacion.getContenido().length()))%></p>
-                                        <p class="text-sm text-gray-900 leading-none">Publicado por: <%= publicacion.getUserId().getNombre()%></p>
-                                        <div class="flex justify-center mt-4 space-x-4">
-                                            <% if (publicacion.getUserId().getNumeroW() != null) {%>
-                                            <a href="https://api.whatsapp.com/send?phone=<%= publicacion.getUserId().getNumeroW()%>" target="_blank" class="inline-block bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full">
-                                                <i class="fab fa-whatsapp"></i> WhatsApp
-                                            </a>
-                                            <% } %>
-                                            <% if (publicacion.getUserId().getUbicacion() != null) {%>
-                                            <a href="https://www.google.com/maps/search/?api=1&query=<%= URLEncoder.encode(publicacion.getUserId().getUbicacion(), "UTF-8")%>" target="_blank" class="inline-block bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-full">
-                                                <i class="fas fa-map-marked"></i> Ver Ubicación
-                                            </a>
-                                            <% } %>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <% } %>
-                    </div>
-                    <% } %>
-
                     <% List<?> publicaciones = (List<?>) request.getAttribute("publicaciones");
                         if (publicaciones != null && !publicaciones.isEmpty()) { %>
                     <h1 class="grande">Todas las Publicaciones</h1>
+                    <%-- Iterar sobre las publicaciones para mostrar cada una con su imagen --%>
                     <div class="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-5">
                         <% for (Object obj : publicaciones) {
                                 Publicaciones publicacion = (Publicaciones) obj;%>
                         <div class="min-h-max flex items-center justify-center">
                             <div class="container mx-auto text-center">
                                 <div class="max-w-sm mx-auto mb-8 bg-white rounded-lg overflow-hidden shadow-md">
-                                    <img class="w-full h-32 object-cover" src="data:image/jpeg;base64,<%= publicacion.getImagen()%>" alt="Imagen de la publicación">
+                                    <%-- Mostrar la imagen en formato Base64 --%>
+                                    <img src="<%= request.getContextPath()%>/images/Lechugaitaliana.png" alt="Imagen de Prueba">
                                     <div class="p-4">
                                         <div class="text-gray-900 font-bold text-xl mb-2"><%= publicacion.getTitulo().substring(0, Math.min(50, publicacion.getTitulo().length()))%></div>
                                         <p class="text-gray-700 text-base"><%= publicacion.getContenido().substring(0, Math.min(150, publicacion.getContenido().length()))%></p>
@@ -144,6 +119,7 @@
                         </div>
                         <% } %>
                     </div>
+
                     <% }%>
                 </div>
             </main>
