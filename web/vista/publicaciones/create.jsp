@@ -46,7 +46,7 @@
 
                     <!-- Botón de Envío -->
                     <div class="flex items-center justify-center mt-6">
-                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300">
+                        <button type="submit" class="btn-custom2 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300">
                             Crear Publicación
                         </button>
                     </div>

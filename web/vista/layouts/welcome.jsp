@@ -75,12 +75,12 @@
                         </div>
                     </div>
 
-                    <form action="<%= request.getContextPath()%>/buscar" method="GET" class="flex items-center border rounded-lg overflow-hidden mb-8 mt-6">
-                        <input type="text" name="nombre" placeholder="Buscar..." class="px-4 py-2 flex-1 outline-none">
-                        <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4">Buscar</button>
+                    <form action="<%= request.getContextPath()%>/buscar" method="GET" class="flex items-center border rounded-lg overflow-hidden mb-8 mt-6 btn-custom2">
+                        <input type="text" name="nombre" placeholder="Buscar..." class="px-4 py-2 flex-1 outline-none btn-custom2">
+                        <button type="submit" class="btn-custom2 text-white font-bold py-2 px-4">Buscar</button>
                     </form>
 
-                    <% String termino = request.getParameter("termino");
+                    <% String termino = request.getParameter("nombre");
                         if (termino != null && !termino.isEmpty()) {%>
                     <h2 class="text-xl font-semibold mb-4">Resultados de la búsqueda para "<%= termino%>"</h2>
                     <% } %>
@@ -103,12 +103,12 @@
                                         <p class="text-sm text-gray-900 leading-none">Publicado por: <%= publicacion.getUserId().getNombre()%></p>
                                         <div class="flex justify-center mt-4 space-x-4">
                                             <% if (publicacion.getUserId().getNumeroW() != null) {%>
-                                            <a href="https://api.whatsapp.com/send?phone=<%= publicacion.getUserId().getNumeroW()%>" target="_blank" class="inline-block bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full">
+                                            <a href="https://api.whatsapp.com/send?phone=<%= publicacion.getUserId().getNumeroW()%>" target="_blank" class="inline-block btn-custom2 text-white font-bold py-2 px-4 rounded-full">
                                                 <i class="fab fa-whatsapp"></i> WhatsApp
                                             </a>
                                             <% } %>
                                             <% if (publicacion.getUserId().getUbicacion() != null) {%>
-                                            <a href="https://www.google.com/maps/search/?api=1&query=<%= URLEncoder.encode(publicacion.getUserId().getUbicacion(), "UTF-8")%>" target="_blank" class="inline-block bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-full">
+                                            <a href="https://www.google.com/maps/search/?api=1&query=<%= URLEncoder.encode(publicacion.getUserId().getUbicacion(), "UTF-8")%>" target="_blank" class="inline-block btn-custom text-white font-bold py-2 px-4 rounded-full">
                                                 <i class="fas fa-map-marked"></i> Ver Ubicación
                                             </a>
                                             <% } %>

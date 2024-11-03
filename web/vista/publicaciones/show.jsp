@@ -8,6 +8,7 @@
         <title>Editar Publicación</title>
         <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/estilo.css">
     </head>
     <body class="bg-gray-100">
         <!-- Navbar -->
@@ -34,7 +35,7 @@
                             <input type="file" name="imagen" accept="image/*" />
                         </div>
 
-                        <button type="submit" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">Actualizar Publicación</button>
+                        <button type="submit" class="mt-4 btn-custom2 text-white px-4 py-2 rounded">Actualizar Publicación</button>
                     </form>
 
                 </div>

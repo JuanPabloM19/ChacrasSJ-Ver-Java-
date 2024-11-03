@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <title>Registro</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/estilo.css">
 </head>
 <body class="bg-gray-100 p-6">
     <div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
@@ -56,10 +57,10 @@
 
             <!-- Botón de Envío -->
             <div class="flex items-center justify-end mt-4">
-                <a class="underline text-sm text-gray-600 hover:text-gray-900" href="${pageContext.request.contextPath}/auth/login.jsp">
+                <a class="underline text-sm text-gray-600 hover:text-gray-900" href="${pageContext.request.contextPath}/vista/auth/login.jsp">
                     ¿Ya estaba registrado?
                 </a>
-                <button type="submit" class="ml-4 bg-blue-500 text-white px-4 py-2 rounded">
+                <button type="submit" class="ml-4 btn-custom2 text-white px-4 py-2 rounded">
                     Registrarse
                 </button>
             </div>

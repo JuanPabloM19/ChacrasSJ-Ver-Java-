@@ -42,15 +42,22 @@
                                             <p class="text-gray-700">
                                                 ${publicacion.contenido}
                                             </p>
-                                            <div class="flex justify-between mt-4">
-                                                <!-- Botones de editar y eliminar -->
-                                                <a href="${pageContext.request.contextPath}/showPublicacion?id=${publicacion.id}" class="text-yellow-500 hover:text-yellow-700">Editar</a>
+                                            <div class="flex justify-between mt-4 space-x-2">
+                                                <!-- Botón de Editar -->
+                                                <a href="${pageContext.request.contextPath}/showPublicacion?id=${publicacion.id}" 
+                                                   class="px-4 py-2 btn-custom text-white rounded shadow-md transition duration-300 ease-in-out">
+                                                    Editar
+                                                </a>
+
+                                                <!-- Botón de Eliminar -->
                                                 <form method="post" action="${pageContext.request.contextPath}/deletePublicacion" class="inline-block" onsubmit="eliminarPublicacion(event, ${publicacion.id})">
-                                                    <button type="submit" class="text-red-500 hover:text-red-700">
+                                                    <button type="submit" 
+                                                            class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 shadow-md transition duration-300 ease-in-out">
                                                         Eliminar
                                                     </button>
                                                 </form>
                                             </div>
+
                                         </div>
                                     </div>
                                 </c:if>
@@ -73,17 +80,17 @@
                     'Content-Type': 'application/json'
                 }
             })
-                .then(response => {
-                    if (response.ok) {
-                        // Eliminar la publicación del DOM
-                        document.getElementById('publicacion-' + publicacionId).remove();
-                        alert('Publicación eliminada con éxito.');
-                    } else {
-                        return response.text().then(errorMessage => {
-                            alert('Error al eliminar la publicación: ' + errorMessage);
-                        });
-                    }
-                });
+                    .then(response => {
+                        if (response.ok) {
+                            // Eliminar la publicación del DOM
+                            document.getElementById('publicacion-' + publicacionId).remove();
+                            alert('Publicación eliminada con éxito.');
+                        } else {
+                            return response.text().then(errorMessage => {
+                                alert('Error al eliminar la publicación: ' + errorMessage);
+                            });
+                        }
+                    });
         }
     }
 

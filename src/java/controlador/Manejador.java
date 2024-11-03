@@ -55,7 +55,8 @@ import java.util.Date;
             "/Logout",
             "/edit",
             "/deletePublicacion",
-            "/showPublicacion"
+            "/showPublicacion",
+            "/resetPassword"
 
         }
 )
@@ -92,6 +93,34 @@ public class Manejador extends HttpServlet {
                     url = "/index.jsp"; // Ajustar ruta si es necesario
                     break;
 
+                case "/resetPassword":
+                    Long userId = (Long) request.getSession().getAttribute("usuarioId");
+                    String currentPassword = request.getParameter("current_password");
+                    String newPassword = request.getParameter("new_password");
+                    String confirmPassword = request.getParameter("confirm_password");
+
+                    // Buscar el usuario en la base de datos
+                    Users user = usersF.find(userId);
+
+                    if (user == null) {
+                        request.getSession().setAttribute("error", "Usuario no encontrado.");
+                    } else if (!user.getPassword().equals(currentPassword)) {
+                        request.getSession().setAttribute("error", "La contraseña actual no es correcta.");
+                    } else if (!newPassword.equals(confirmPassword)) {
+                        request.getSession().setAttribute("error", "Las contraseñas no coinciden.");
+                    } else {
+                        // Cambiar la contraseña
+                        if (usersF.cambiarContrasena(userId, newPassword)) {
+                            request.getSession().setAttribute("message", "Contraseña actualizada correctamente.");
+                        } else {
+                            request.getSession().setAttribute("error", "Error al cambiar la contraseña.");
+                        }
+                    }
+
+                    // Aquí no debe haber código que imprima en el flujo de salida
+                    response.sendRedirect(request.getContextPath() + "/vista/layouts/profile.jsp");
+                    return; // Asegúrate de terminar el método aquí
+
                 case "/Logout":
                     HttpSession session = request.getSession(false); // Obtener la sesión actual, si existe
                     if (session != null) {
@@ -101,14 +130,14 @@ public class Manejador extends HttpServlet {
                     break;
 
                 case "/edit":
-    session = request.getSession();
-    Users usuario = (Users) session.getAttribute("usuario"); // Obtener el usuario completo de sesión
-    Long userId = usuario.getId(); // Extraer solo el ID
-    List<Publicaciones> publicaciones = publicacionesF.obtenerPublicacionesPorUsuario(userId);
-    request.setAttribute("publicaciones", publicaciones);
-    request.setAttribute("usuarioId", userId); // Pasar usuarioId para el JSP
-    request.getRequestDispatcher("edit.jsp").forward(request, response);
-    break;
+                    session = request.getSession();
+                    Users usuario = (Users) session.getAttribute("usuario"); // Obtener el usuario completo de sesión
+                    userId = usuario.getId(); // Extraer solo el ID
+                    List<Publicaciones> publicaciones = publicacionesF.obtenerPublicacionesPorUsuario(userId);
+                    request.setAttribute("publicaciones", publicaciones);
+                    request.setAttribute("usuarioId", userId); // Pasar usuarioId para el JSP
+                    request.getRequestDispatcher("edit.jsp").forward(request, response);
+                    break;
 
                 // Mostrar una publicación específica para editar
                 case "/showPublicacion":
@@ -315,6 +344,7 @@ public class Manejador extends HttpServlet {
                             request.getSession().setAttribute("es_administrador", usuarioLogin.getEsAdministrador());
                             request.getSession().setAttribute("bloqueado", usuarioLogin.getBloqueado());
                             request.getSession().setAttribute("es_publicador", usuarioLogin.getEsPublicador());
+                            request.getSession().setAttribute("user", usuarioLogin); // Almacena el objeto del usuario
 
                             url = "/vista/layouts/dashboard.jsp"; // Redirige al dashboard
                         } else {

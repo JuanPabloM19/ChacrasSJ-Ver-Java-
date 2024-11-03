@@ -84,4 +84,22 @@
     align-items: center; /* Alinear verticalmente el texto y el icono */
 }
 
+.btn-custom {
+    background-color: #f39200;
+    color: white;
+}
+
+.btn-custom:hover {
+    background-color: #d98100; /* Un tono más oscuro para el hover */
+}
+
+.btn-custom2 {
+    background-color: #009640;
+    color: white;
+}
+
+.btn-custom2:hover {
+    background-color: #008235; /* Un tono más oscuro para el hover */
+}
+
 /* Resto del CSS... */

@@ -64,7 +64,7 @@
                             <td>${cuenta.ubicacion}</td>
                             <td>${cuenta.numeroW}</td>
                             <td>
-                                <button type="button" class="btn btn-success" onclick="aceptarUsuario(${cuenta.id})">Aceptar</button>
+                                <button type="button" class="btn btn-custom2" onclick="aceptarUsuario(${cuenta.id})">Aceptar</button>
                             </td>
                         </tr>
                     </c:forEach>

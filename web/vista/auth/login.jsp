@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>Iniciar Sesión</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/estilo.css">
 </head>
 <body class="bg-gray-100 p-6">
     <div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
@@ -39,7 +40,7 @@
                     ¿Olvidó su contraseña?
                 </a>
 
-                <button type="submit" class="ml-4 bg-blue-500 text-white px-4 py-2 rounded">Iniciar Sesión</button>
+                <button type="submit" class="ml-4 btn-custom text-white px-4 py-2 rounded">Iniciar Sesión</button>
             </div>
         </form>
     </div>

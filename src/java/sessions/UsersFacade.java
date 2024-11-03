@@ -49,4 +49,19 @@ public class UsersFacade extends AbstractFacade<Users> {
         return em.createQuery("SELECT u FROM Users u WHERE u.bloqueado = true", Users.class)
                 .getResultList();
     }
+
+    public boolean cambiarContrasena(Long userId, String nuevaContrasena) {
+        try {
+            Users user = em.find(Users.class, userId); // Busca el usuario por su ID
+            if (user != null) {
+                user.setPassword(nuevaContrasena); // Cambia la contraseña
+                em.merge(user); // Actualiza el usuario en la base de datos
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 }
