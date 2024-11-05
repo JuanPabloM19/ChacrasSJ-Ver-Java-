@@ -41,7 +41,7 @@
         <!-- Navbar -->
         <jsp:include page="/vista/layouts/navbar.jsp" />
         <div class="container mt-5">
-            <h2 class="mb-4">Usuarios Pendientes de Aceptación</h2>
+            <h2 class="text-2xl font-bold mb-6">Usuarios Pendientes de Aceptación</h2>
 
             <!-- Tabla de usuarios pendientes -->
             <table class="table table-bordered table-striped">

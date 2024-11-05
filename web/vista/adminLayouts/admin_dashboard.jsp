@@ -15,7 +15,7 @@
     <!-- Navbar -->
     <jsp:include page="/vista/layouts/navbar.jsp" />
     <div class="container mt-5">
-    <h2 class="mb-4">Todas las Publicaciones</h2>
+    <h2 class="text-2xl font-bold mb-6">Todas las Publicaciones</h2>
 
     <!-- Tabla de publicaciones -->
     <table class="table table-bordered table-striped">

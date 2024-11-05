@@ -54,12 +54,11 @@ public class PublicacionesFacade extends AbstractFacade<Publicaciones> {
         return query.getResultList();
     }
 
-    // Método para buscar publicaciones por título o contenido
     public List<Publicaciones> buscarPublicaciones(String termino) {
-        TypedQuery<Publicaciones> query = em.createQuery(
-                "SELECT p FROM Publicaciones p WHERE LOWER(p.titulo) LIKE LOWER(CONCAT('%', :termino, '%')) OR LOWER(p.contenido) LIKE LOWER(CONCAT('%', :termino, '%'))", Publicaciones.class);
-        query.setParameter("termino", termino);
-        return query.getResultList();
+        String query = "SELECT p FROM Publicaciones p WHERE p.titulo LIKE :termino";
+        return em.createQuery(query, Publicaciones.class)
+                .setParameter("termino", "%" + termino + "%")
+                .getResultList();
     }
 
     // Método para obtener todas las publicaciones

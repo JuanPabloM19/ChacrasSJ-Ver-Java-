@@ -1,43 +1,41 @@
 package controlador;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Base64;
 
-@WebServlet("/imageLoader")
+@WebServlet("/ImageLoaderServlet")
 public class ImageLoaderServlet extends HttpServlet {
 
+    // Ruta base para las imágenes
+    private static final String IMAGE_DIRECTORY = "D:\\ChacrasSJNETBEANS\\ChacrasSJ\\web\\cargaIMG\\uploads";
+
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setHeader("Access-Control-Allow-Origin", "*"); // Permitir todos los orígenes
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Obtener el nombre de la imagen desde el parámetro de la solicitud
+        String imageName = request.getParameter("imageName");
 
-        String imageName = request.getParameter("image");
-        File imageFile = new File("C:/uploads/" + imageName); // Ruta completa a la imagen
+        // Construir la ruta completa de la imagen
+        File imageFile = new File(IMAGE_DIRECTORY, imageName);
 
-        if (!imageFile.exists()) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Imagen no encontrada: " + imageFile.getAbsolutePath());
-            return;
-        }
+        // Verificar si el archivo existe y es un archivo válido
+        if (imageFile.exists() && imageFile.isFile()) {
+            // Configurar el tipo de contenido de respuesta según el tipo de archivo
+            response.setContentType("image/jpeg");
 
-        response.setContentType("image/png"); // o image/jpeg si es JPEG
-        response.setContentLength((int) imageFile.length());
+            // Copiar el archivo en el flujo de salida de la respuesta
+            Files.copy(imageFile.toPath(), response.getOutputStream());
 
-        try (FileInputStream fis = new FileInputStream(imageFile); ServletOutputStream outputStream = response.getOutputStream()) {
-            byte[] buffer = new byte[4096];
-            int bytesRead;
-            while ((bytesRead = fis.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, bytesRead);
-            }
-        } catch (IOException e) {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error al cargar la imagen: " + e.getMessage());
+            // Asegurar que el flujo de salida se vacía completamente
+            response.getOutputStream().flush();
+        } else {
+            // Enviar un error 404 si la imagen no se encuentra
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "La imagen no fue encontrada en el servidor.");
         }
     }
 }

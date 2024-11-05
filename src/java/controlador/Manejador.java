@@ -29,12 +29,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
+import java.util.Collections;
 import java.util.Date;
 
 @WebServlet(name = "Manejador",
@@ -43,8 +45,7 @@ import java.util.Date;
             "/CrearPublicacion",
             "/ListarPublicaciones",
             "/AgregarUsuario",
-            "/ListarUsuarios",
-            "/index", // Ruta para la página principal
+            "/ListarUsuarios", // Ruta para la página principal
             "/buscar",
             "/Login", // Agrega la ruta para login
             "/Register", // Agrega la ruta para registro
@@ -56,7 +57,8 @@ import java.util.Date;
             "/edit",
             "/deletePublicacion",
             "/showPublicacion",
-            "/resetPassword"
+            "/resetPassword",
+            "/welcome"
 
         }
 )
@@ -86,11 +88,10 @@ public class Manejador extends HttpServlet {
         try {
             switch (pathUsuario) {
 
-                case "/index":
+                case "/welcome":
                     List<Publicaciones> listadoPublicaciones = publicacionesF.findAll();
-                    request.setAttribute("publicaciones", listadoPublicaciones);
-
-                    url = "/index.jsp"; // Ajustar ruta si es necesario
+                    request.setAttribute("listaPublicaciones", listadoPublicaciones);
+                    url = "/welcome.jsp"; // Ajusta la ruta según tu configuración
                     break;
 
                 case "/resetPassword":
@@ -217,14 +218,27 @@ public class Manejador extends HttpServlet {
                 // return;
                 case "/buscar":
                     String termino = request.getParameter("nombre");
+                    List<Publicaciones> resultadosBusqueda = null;
                     if (termino != null && !termino.trim().isEmpty()) {
-                        List<Publicaciones> resultadosBusqueda = publicacionesF.buscarPublicaciones(termino);
-                        request.setAttribute("ultimasPublicaciones", resultadosBusqueda);
+                        resultadosBusqueda = publicacionesF.buscarPublicaciones(termino);
                     } else {
-                        List<Publicaciones> ultimasPublicacionesDefault = publicacionesF.findAll(); // Cargar todas si no hay término
-                        request.setAttribute("ultimasPublicaciones", ultimasPublicacionesDefault);
+                        resultadosBusqueda = publicacionesF.findAll(); // Mostrar todas si el término está vacío
                     }
-                    url = "/vista/publicaciones/index.jsp";
+
+                    // Construir el HTML de respuesta con los resultados
+                    response.setContentType("text/html;charset=UTF-8");
+                    try (PrintWriter out = response.getWriter()) {
+                        if (resultadosBusqueda != null && !resultadosBusqueda.isEmpty()) {
+                            for (Publicaciones publicacion : resultadosBusqueda) {
+                                out.println("<div class='result-item'>");
+                                out.println("<h3>" + publicacion.getTitulo() + "</h3>");
+                                out.println("<p>" + publicacion.getContenido() + "</p>");
+                                out.println("</div>");
+                            }
+                        } else {
+                            out.println("<p>No se encontraron resultados para \"" + termino + "\"</p>");
+                        }
+                    }
                     break;
 
                 case "/CrearPublicacion":
@@ -483,7 +497,7 @@ public class Manejador extends HttpServlet {
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+// <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *

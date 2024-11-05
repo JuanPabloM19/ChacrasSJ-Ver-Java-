@@ -27,13 +27,14 @@
 
                 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
                     <div class="text-gray-900 dark:text-gray-100">
+                        <h1 class="text-2xl font-bold mb-6">Tus Publicaciones</h1>
                         <!-- Grid de publicaciones -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                             <c:forEach var="publicacion" items="${publicaciones}">
                                 <c:if test="${publicacion.userId.id == usuarioId}">
                                     <div class="bg-white shadow-lg rounded-lg overflow-hidden" id="publicacion-${publicacion.id}">
                                         <div class="relative">
-                                            <img src="data:image/jpeg;base64,${publicacion.imagen}" alt="Imagen de la Publicación" class="w-full h-48 object-cover">
+                                            <img src="http://localhost:8080/ChacrasSJ/ImageLoaderServlet?imageName=${publicacion.imagen}" class="w-full h-48 object-cover">
                                             <div class="bg-gray-800 text-white text-center p-2 font-semibold absolute bottom-0 w-full">
                                                 ${publicacion.titulo}
                                             </div>
