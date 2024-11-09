@@ -9,12 +9,12 @@
 .logo-container {
     display: flex;
     align-items: center;
-    justify-content: space-between; /* Distribuye los elementos uniformemente */
-    width: auto; /* Ajuste para que no ocupe todo el ancho */
+    justify-content: space-between;
+    width: auto;
 }
 
 .log {
-    display: inline-block; /* En lugar de float, usa inline-block */
+    display: inline-block;
     margin-right: 1rem;
     width: 100px;
 }
@@ -72,16 +72,16 @@
 }
 
 .nav-link {
-    font-size: 1.2rem;  /* Aumentar o ajustar el tamaño de la fuente */
-    font-weight: bold;  /* Otras opciones: normal, lighter */
-    color: #333;        /* Asegúrate de que el color sea más visible */
-    margin-left: 10px;  /* Añadir espacio entre el icono y el texto */
+    font-size: 1.2rem;  
+    font-weight: bold;  
+    color: #333;        
+    margin-left: 10px;  
 }
 
 .nav-item {
-    padding: 10px 15px; /* Aumentar el espaciado alrededor del texto "Panel" */
+    padding: 10px 15px;
     display: flex;
-    align-items: center; /* Alinear verticalmente el texto y el icono */
+    align-items: center; 
 }
 
 .btn-custom {
@@ -90,7 +90,7 @@
 }
 
 .btn-custom:hover {
-    background-color: #d98100; /* Un tono más oscuro para el hover */
+    background-color: #d98100; 
 }
 
 .btn-custom2 {
@@ -99,7 +99,5 @@
 }
 
 .btn-custom2:hover {
-    background-color: #008235; /* Un tono más oscuro para el hover */
+    background-color: #008235;
 }
-
-/* Resto del CSS... */

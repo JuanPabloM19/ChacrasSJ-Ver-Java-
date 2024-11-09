@@ -14,7 +14,6 @@
         <jsp:include page="/vista/layouts/navbar.jsp" />
 
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 py-12 space-y-6">
-            <!-- Mensaje de éxito o error -->
             <c:if test="${not empty sessionScope.message}">
                 <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
                     <strong class="font-bold">Éxito:</strong>
@@ -73,8 +72,6 @@
 
                         <form method="post" action="${pageContext.request.contextPath}/resetPassword" class="mt-6 space-y-6">
                             <input type="hidden" name="_csrf" value="${csrfToken}"/>
-
-                            <!-- Campo de contraseña actual con ícono de ojo -->
                             <div>
                                 <label for="current_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Contraseña Actual</label>
                                 <div class="relative">
@@ -88,7 +85,6 @@
                                 </div>
                             </div>
 
-                            <!-- Campo de nueva contraseña con ícono de ojo -->
                             <div>
                                 <label for="new_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nueva contraseña</label>
                                 <div class="relative">
@@ -102,7 +98,6 @@
                                 </div>
                             </div>
 
-                            <!-- Campo de confirmación de contraseña con ícono de ojo -->
                             <div>
                                 <label for="confirm_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Repetir contraseña</label>
                                 <div class="relative">
@@ -147,7 +142,7 @@
         var confirmPassword = document.getElementById('confirm_password').value;
         if (newPassword !== confirmPassword) {
             alert('Las contraseñas no coinciden.');
-            e.preventDefault();  // Detener el envío del formulario
+            e.preventDefault();
         }
     });
 </script>

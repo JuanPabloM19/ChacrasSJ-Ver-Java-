@@ -13,16 +13,14 @@
     <body class="bg-gray-100">
         <!-- Navbar -->
         <jsp:include page="/vista/layouts/navbar.jsp" />
-        <!-- Contenedor principal -->
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <!-- Mostrar mensaje de éxito si existe -->
                 <% String successMessage = (String) session.getAttribute("success");
                     if (successMessage != null) {%>
                 <div class="bg-green-400 text-gray-800 font-extrabold p-4 rounded-lg mb-6 text-center">
                     <%= successMessage%>
                 </div>
-                <% session.removeAttribute("success"); // Limpiar el mensaje después de mostrarlo
+                <% session.removeAttribute("success");
                     }%>
 
                 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
@@ -58,7 +56,6 @@
                                                     </button>
                                                 </form>
                                             </div>
-
                                         </div>
                                     </div>
                                 </c:if>
@@ -72,11 +69,11 @@
 </html>
 <script>
     function eliminarPublicacion(event, publicacionId) {
-        event.preventDefault(); // Prevenir el envío del formulario
+        event.preventDefault();
 
         if (confirm('¿Estás seguro de que deseas eliminar esta publicación?')) {
             fetch('${pageContext.request.contextPath}/deletePublicacion?id=' + publicacionId, {
-                method: 'POST', // Cambiar DELETE a POST
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 }

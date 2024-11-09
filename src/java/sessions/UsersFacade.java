@@ -37,7 +37,7 @@ public class UsersFacade extends AbstractFacade<Users> {
             query.setParameter("email", email);
             return query.getSingleResult();
         } catch (NoResultException e) {
-            return null; // Devuelve null si no se encuentra el usuario
+            return null;
         }
     }
 
@@ -52,10 +52,10 @@ public class UsersFacade extends AbstractFacade<Users> {
 
     public boolean cambiarContrasena(Long userId, String nuevaContrasena) {
         try {
-            Users user = em.find(Users.class, userId); // Busca el usuario por su ID
+            Users user = em.find(Users.class, userId); 
             if (user != null) {
-                user.setPassword(nuevaContrasena); // Cambia la contraseña
-                em.merge(user); // Actualiza el usuario en la base de datos
+                user.setPassword(nuevaContrasena);
+                em.merge(user);
                 return true;
             }
         } catch (Exception e) {
@@ -63,5 +63,4 @@ public class UsersFacade extends AbstractFacade<Users> {
         }
         return false;
     }
-
 }

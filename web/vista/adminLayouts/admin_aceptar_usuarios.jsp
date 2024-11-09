@@ -21,15 +21,13 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/estilo.css">
 
-        <!-- Incluimos JQuery para manejo fácil de AJAX -->
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script>
             function aceptarUsuario(usuarioId) {
                 $.post("${pageContext.request.contextPath}/AceptarCuentas", {usuarioId: usuarioId, accion: "aceptar"})
                         .done(function (response) {
-                            console.log("Respuesta del servidor: ", response); // Imprimir la respuesta
-                            // Actualiza la tabla o recarga la página
-                            window.location.reload(); // Recargar la página para reflejar cambios
+                            console.log("Respuesta del servidor: ", response);
+                            window.location.reload();
                         })
                         .fail(function (xhr, status, error) {
                             console.error("Error al aceptar el usuario: " + xhr.status + " - " + xhr.responseText);
@@ -42,8 +40,6 @@
         <jsp:include page="/vista/layouts/navbar.jsp" />
         <div class="container mt-5">
             <h2 class="text-2xl font-bold mb-6">Usuarios Pendientes de Aceptación</h2>
-
-            <!-- Tabla de usuarios pendientes -->
             <table class="table table-bordered table-striped">
                 <thead class="thead-dark">
                     <tr>

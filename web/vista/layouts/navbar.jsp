@@ -3,7 +3,7 @@
     String nombre = (String) session.getAttribute("nombre");
     String email = (String) session.getAttribute("email");
     Boolean esAdministrador = (Boolean) session.getAttribute("es_administrador");
-    Boolean esPublicador = (Boolean) session.getAttribute("es_publicador"); // Nuevo atributo para verificar si es publicador
+    Boolean esPublicador = (Boolean) session.getAttribute("es_publicador");
 %>
 
 <nav class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">

@@ -40,28 +40,25 @@ public class PublicacionesFacade extends AbstractFacade<Publicaciones> {
             throw new IllegalArgumentException("La publicación no puede ser nula");
         }
         try {
-            em.persist(publicacion); // Persistir la publicación
+            em.persist(publicacion);
         } catch (Exception e) {
             System.err.println("Error persisting publication: " + e.getMessage());
-            throw e; // Propagar la excepción
+            throw e;
         }
     }
 
-    // Método para obtener las últimas publicaciones
     public List<Publicaciones> findUltimasPublicaciones() {
         TypedQuery<Publicaciones> query = em.createQuery("SELECT p FROM Publicaciones p", Publicaciones.class);
-        query.setMaxResults(10); // Limitar a las últimas 10 publicaciones
+        query.setMaxResults(10); 
         return query.getResultList();
     }
 
     public List<Publicaciones> buscarPublicaciones(String termino) {
-        String query = "SELECT p FROM Publicaciones p WHERE p.titulo LIKE :termino";
-        return em.createQuery(query, Publicaciones.class)
-                .setParameter("termino", "%" + termino + "%")
-                .getResultList();
+        TypedQuery<Publicaciones> query = em.createQuery("SELECT p FROM Publicaciones p WHERE p.titulo LIKE :termino", Publicaciones.class);
+        query.setParameter("termino", "%" + termino + "%");
+        return query.getResultList();
     }
 
-    // Método para obtener todas las publicaciones
     public List<Publicaciones> obtenerTodasLasPublicaciones() {
         return em.createQuery("SELECT p FROM Publicaciones p", Publicaciones.class).getResultList();
     }
@@ -72,15 +69,11 @@ public class PublicacionesFacade extends AbstractFacade<Publicaciones> {
 
     public void create(Publicaciones publicaciones) {
         try {
-            // Supongamos que tienes acceso al EntityManager
             Users user = em.find(Users.class, publicaciones.getUserId().getId());
-            publicaciones.setUserId(user); // Asegúrate de asignar el objeto User a la publicación
-
+            publicaciones.setUserId(user);
             em.persist(publicaciones);
         } catch (ConstraintViolationException e) {
-            // Manejo de la excepción
         } catch (Exception e) {
-            // Manejo de la excepción
         }
     }
 
@@ -107,11 +100,10 @@ public class PublicacionesFacade extends AbstractFacade<Publicaciones> {
             throw new IllegalArgumentException("La publicación no puede ser nula");
         }
         try {
-            em.merge(publicacion); // Utiliza merge para actualizar la entidad
+            em.merge(publicacion);
         } catch (Exception e) {
             System.err.println("Error updating publication: " + e.getMessage());
-            throw e; // Propagar la excepción
+            throw e;
         }
     }
-
 }

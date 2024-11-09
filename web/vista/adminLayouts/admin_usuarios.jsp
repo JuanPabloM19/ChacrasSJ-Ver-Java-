@@ -16,8 +16,6 @@
     <jsp:include page="/vista/layouts/navbar.jsp" />
     <div class="container mt-5">
     <h2 class="text-2xl font-bold mb-6">Todos los Usuarios</h2>
-
-    <!-- Tabla de usuarios -->
     <table class="table table-bordered table-striped">
         <thead class="thead-dark">
             <tr>

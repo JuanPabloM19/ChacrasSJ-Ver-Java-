@@ -5,7 +5,7 @@
     // Verificar si la sesión contiene el nombre del usuario
     String nombre = (String) session.getAttribute("nombre");
     if (nombre == null || nombre.isEmpty()) {
-        response.sendRedirect("login.jsp"); // Redirigir al login si no está autenticado
+        response.sendRedirect("login.jsp");
     }
 
     String email = (String) session.getAttribute("email");
@@ -15,7 +15,7 @@
 
     // Verificar si el valor de bloqueado está correctamente definido
     if (bloqueado == null) {
-        bloqueado = true; // Si no se encuentra, por defecto está bloqueado
+        bloqueado = true;
     }
 %>
 
@@ -36,8 +36,6 @@
     <body>
         <!-- Navbar -->
         <jsp:include page="/vista/layouts/navbar.jsp" />
-
-        <!-- Contenido del panel -->
         <div class="max-w-7xl mx-auto p-6">
             <h1 class="text-2xl font-semibold text-gray-800">Bienvenido, <%= nombre %> al Panel de Navegación</h1>
             <c:choose>
@@ -48,12 +46,9 @@
                 </c:when>
                 <c:otherwise>
                     <p class="mt-4">Aquí puedes gestionar tus publicaciones y configuraciones.</p>
-                    <!-- Aquí puedes añadir más contenido que solo los usuarios no bloqueados deberían ver -->
                 </c:otherwise>
             </c:choose>
         </div>
-
-        <!-- JavaScript para manejar el dropdown y el menú móvil -->
         <script>
             function toggleDropdown() {
                 var dropdownMenu = document.getElementById('dropdownMenu');
