@@ -53,7 +53,8 @@ import java.util.Date;
             "/adminDashboard",
             "/eliminarPublicacion",
             "/eliminarUsuario",
-            "/adminUsers"
+            "/adminUsers",
+            "/editarPubliAdmin"
         }
 )
 @MultipartConfig
@@ -153,11 +154,8 @@ public class Manejador extends HttpServlet {
                         // Actualizar la sesión con la lista de usuarios
                         request.getSession().setAttribute("usuarios", usuariosActualizados);
                         request.setAttribute("mensaje", "Usuario eliminado exitosamente.");
-
-                        // Redirigir de nuevo a la vista de usuarios para reflejar el cambio
                         request.getRequestDispatcher("/vista/adminLayouts/admin_usuarios.jsp").forward(request, response);
                     } catch (Exception e) {
-                        // Si hay un error, mostrar un mensaje de error
                         request.setAttribute("error", "Hubo un problema al eliminar el usuario.");
                         request.getRequestDispatcher("/vista/adminLayouts/admin_usuarios.jsp").forward(request, response);
                     }
@@ -205,8 +203,7 @@ public class Manejador extends HttpServlet {
                             Users usuarioLogin = (Users) request.getSession().getAttribute("user");
                             List<Publicaciones> publicacionesActualizadas = publicacionesF.obtenerPublicacionesPorUsuario(usuarioLogin.getId());
                             request.getSession().setAttribute("publicaciones", publicacionesActualizadas);
-
-                            // Redirige a la página de edición o al listado
+                            
                             response.sendRedirect(request.getContextPath() + "/vista/publicaciones/edit.jsp");
                             return;
 
@@ -301,7 +298,6 @@ public class Manejador extends HttpServlet {
                             List<Publicaciones> publicacionesUsuario = publicacionesF.obtenerPublicacionesPorUsuario(usuarioId);
                             request.getSession().setAttribute("publicaciones", publicacionesUsuario);
 
-                            // Redirigir a edit.jsp después de la creación exitosa
                             url = request.getContextPath() + "/vista/publicaciones/edit.jsp";
                             response.sendRedirect(url);
                             return;
@@ -311,7 +307,6 @@ public class Manejador extends HttpServlet {
                             request.setAttribute("error", "Hubo un problema al guardar la publicación. Revise los datos ingresados.");
                             url = "/vista/publicaciones/create.jsp";
                             request.getRequestDispatcher(url).forward(request, response);
-
                         }
                     }
                     break;
@@ -333,22 +328,13 @@ public class Manejador extends HttpServlet {
                             request.getSession().setAttribute("es_publicador", usuarioLogin.getEsPublicador());
                             request.getSession().setAttribute("user", usuarioLogin);
 
-                            // Obtener y guardar en sesión las publicaciones basadas en el rol del usuario
-                            List<Publicaciones> publicaciones;
+                            // Cargar publicaciones según el tipo de usuario
                             if (usuarioLogin.getEsAdministrador()) {
-                                // Si el usuario es administrador, obtiene todas las publicaciones
-                                publicaciones = publicacionesF.obtenerTodasLasPublicaciones();
-                            } else {
-                                // Si es un usuario normal, obtiene solo sus publicaciones
-                                publicaciones = publicacionesF.obtenerPublicacionesPorUsuario(usuarioLogin.getId());
+                                List<Publicaciones> publicacionesAdmin = publicacionesF.obtenerTodasLasPublicaciones();
+                                request.getSession().setAttribute("publicaciones", publicacionesAdmin);
                             }
-                            request.getSession().setAttribute("publicaciones", publicaciones);
-
-                            // Obtener y guardar los usuarios en la sesión si es administrador
-                            if (usuarioLogin.getEsAdministrador()) {
-                                List<Users> usuarios = usersF.obtenerTodasLosUsers();
-                                request.getSession().setAttribute("usuarios", usuarios);
-                            }
+                            List<Publicaciones> publicacionesUsuario = publicacionesF.obtenerPublicacionesPorUsuario(usuarioLogin.getId());
+                            request.getSession().setAttribute("publicacionesUsuario", publicacionesUsuario);
 
                             url = "/vista/layouts/dashboard.jsp";
                         } else {
@@ -431,6 +417,24 @@ public class Manejador extends HttpServlet {
                     } else {
                         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                         response.getWriter().write("No tiene permisos de administrador.");
+                    }
+                    break;
+
+                case "/editarPubliAdmin":
+                    try {
+                        Long usuarioId = (Long) request.getSession().getAttribute("usuarioId");
+                        if (usuarioId == null) {
+                            throw new Exception("El usuario no está logueado.");
+                        }
+                        // Filtrar las publicaciones del administrador logueado
+                        List<Publicaciones> publicacionesAdmin = publicacionesF.obtenerPublicacionesPorUsuario(usuarioId);
+
+                        request.setAttribute("publicaciones", publicacionesAdmin);
+                        request.getRequestDispatcher("/vista/adminLayouts/lista_publicaciones.jsp").forward(request, response);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        request.setAttribute("error", "Hubo un error al cargar las publicaciones.");
+                        request.getRequestDispatcher("/vista/adminLayouts/admin_dashboard.jsp").forward(request, response);
                     }
                     break;
 

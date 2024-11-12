@@ -20,7 +20,7 @@
                         <h1 class="text-2xl font-bold mb-6">Tus Publicaciones</h1>
                         <!-- Grid de publicaciones -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                            <c:forEach var="publicacion" items="${publicaciones}">
+                            <c:forEach var="publicacion" items="${publicacionesUsuario}">
                                 <div class="bg-white shadow-lg rounded-lg overflow-hidden" id="publicacion-${publicacion.id}">
                                     <div class="relative">
                                         <img src="http://localhost:8080/ChacrasSJ/ImageLoaderServlet?imageName=${publicacion.imagen}" class="w-full h-48 object-cover">
@@ -52,7 +52,7 @@
         if (confirm('¿Estás seguro de que deseas eliminar esta publicación?')) {
             fetch('${pageContext.request.contextPath}/deletePublicacion?id=' + publicacionId, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
+                headers: {'Content-Type': 'application/json'}
             }).then(response => {
                 if (response.ok) {
                     document.getElementById('publicacion-' + publicacionId).remove();

@@ -39,7 +39,6 @@
                             <td>${usuario.ubicacion}</td>
                             <td>${usuario.email}</td>
                             <td>
-                                <!-- Formulario para eliminar usuario -->
                                 <form action="${pageContext.request.contextPath}/eliminarUsuario" method="post" style="display:inline;">
                                     <input type="hidden" name="id" value="${usuario.id}" />
                                     <button type="submit" class="btn btn-danger">Eliminar</button>
