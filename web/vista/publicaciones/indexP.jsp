@@ -15,17 +15,6 @@
         <jsp:include page="/vista/layouts/navbar.jsp" />
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <%
-                    String successMessage = (String) session.getAttribute("success");
-                    if (successMessage != null) {
-                %>
-                <div class="max-w-md mx-auto bg-green-400 text-gray-800 font-extrabold p-4 rounded-lg mb-6">
-                    <%= successMessage%>
-                </div>
-                <%
-                        session.removeAttribute("success");
-                    }
-                %>
                 <!-- Botón para crear nueva publicación -->
                 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-6">
                     <div class="p-6 text-gray-900 dark:text-gray-100">

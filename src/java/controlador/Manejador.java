@@ -47,10 +47,13 @@ import java.util.Date;
             "/Register",
             "/AceptarCuentas",
             "/Logout",
-            "/edit",
             "/deletePublicacion",
             "/showPublicacion",
             "/resetPassword",
+            "/adminDashboard",
+            "/eliminarPublicacion",
+            "/eliminarUsuario",
+            "/adminUsers"
         }
 )
 @MultipartConfig
@@ -110,14 +113,54 @@ public class Manejador extends HttpServlet {
                     request.getRequestDispatcher("/vista/layouts/welcome.jsp").forward(request, response);
                     break;
 
-                case "/edit":
-                    session = request.getSession();
-                    Users usuario = (Users) session.getAttribute("usuario");
-                    userId = usuario.getId();
-                    List<Publicaciones> publicaciones = publicacionesF.obtenerPublicacionesPorUsuario(userId);
-                    request.setAttribute("publicaciones", publicaciones);
-                    request.setAttribute("usuarioId", userId);
-                    request.getRequestDispatcher("edit.jsp").forward(request, response);
+                case "/adminDashboard":
+                    List<Publicaciones> todasPublicaciones = publicacionesF.obtenerTodasLasPublicaciones();
+                    request.setAttribute("publicaciones", todasPublicaciones);
+                    request.getRequestDispatcher("/vista/adminLayouts/admin_dashboard.jsp").forward(request, response);
+                    break;
+
+                case "/eliminarPublicacion":
+                    try {
+                        Long publicacionId = Long.parseLong(request.getParameter("id"));
+                        publicacionesF.eliminarPublicacion(publicacionId);
+
+                        // Recargar las publicaciones después de eliminar
+                        List<Publicaciones> publicacionesActualizadas = publicacionesF.obtenerTodasLasPublicaciones();
+                        request.setAttribute("publicaciones", publicacionesActualizadas);
+                        request.setAttribute("mensaje", "Publicación eliminada exitosamente.");
+                        request.getRequestDispatcher("/vista/adminLayouts/admin_dashboard.jsp").forward(request, response);
+                    } catch (Exception e) {
+                        // Si hay un error, mostrar un mensaje de error
+                        request.setAttribute("error", "Hubo un problema al eliminar la publicación.");
+                        request.getRequestDispatcher("/vista/adminLayouts/admin_dashboard.jsp").forward(request, response);
+                    }
+                    break;
+
+                case "/adminUsers":
+                    List<Users> todosU = usersF.obtenerTodasLosUsers();
+                    request.setAttribute("usuarios", todosU);
+                    request.getRequestDispatcher("/vista/adminLayouts/admin_usuarios.jsp").forward(request, response);
+                    break;
+
+                case "/eliminarUsuario":
+                    try {
+                        Long usuarioId = Long.parseLong(request.getParameter("id"));
+                        usersF.eliminarUsuario(usuarioId);
+
+                        // Actualizar la lista de usuarios después de eliminar
+                        List<Users> usuariosActualizados = usersF.obtenerTodasLosUsers();
+
+                        // Actualizar la sesión con la lista de usuarios
+                        request.getSession().setAttribute("usuarios", usuariosActualizados);
+                        request.setAttribute("mensaje", "Usuario eliminado exitosamente.");
+
+                        // Redirigir de nuevo a la vista de usuarios para reflejar el cambio
+                        request.getRequestDispatcher("/vista/adminLayouts/admin_usuarios.jsp").forward(request, response);
+                    } catch (Exception e) {
+                        // Si hay un error, mostrar un mensaje de error
+                        request.setAttribute("error", "Hubo un problema al eliminar el usuario.");
+                        request.getRequestDispatcher("/vista/adminLayouts/admin_usuarios.jsp").forward(request, response);
+                    }
                     break;
 
                 case "/showPublicacion":
@@ -158,7 +201,13 @@ public class Manejador extends HttpServlet {
 
                             publicacionesF.edit(publicacion);
 
-                            response.sendRedirect(request.getContextPath() + "/showPublicacion?id=" + publicacion.getId());
+                            // Actualiza la lista de publicaciones en la sesión después de editar la publicación
+                            Users usuarioLogin = (Users) request.getSession().getAttribute("user");
+                            List<Publicaciones> publicacionesActualizadas = publicacionesF.obtenerPublicacionesPorUsuario(usuarioLogin.getId());
+                            request.getSession().setAttribute("publicaciones", publicacionesActualizadas);
+
+                            // Redirige a la página de edición o al listado
+                            response.sendRedirect(request.getContextPath() + "/vista/publicaciones/edit.jsp");
                             return;
 
                         } catch (Exception e) {
@@ -201,7 +250,6 @@ public class Manejador extends HttpServlet {
                 case "/CrearPublicacion":
                     if (request.getMethod().equalsIgnoreCase("POST")) {
                         Long usuarioId = (Long) request.getSession().getAttribute("usuarioId");
-                        System.out.println("Usuario ID: " + usuarioId);
 
                         if (usuarioId == null) {
                             request.setAttribute("error", "Debes estar autenticado para crear una publicación.");
@@ -213,27 +261,20 @@ public class Manejador extends HttpServlet {
                         String titulo = request.getParameter("titulo");
                         String contenido = request.getParameter("contenido");
                         String imagen = "";
-                        System.out.println("Título: " + titulo);
-                        System.out.println("Contenido: " + contenido);
 
                         try {
                             Part imagenPart = request.getPart("imagen");
                             if (imagenPart != null && imagenPart.getSize() > 0) {
                                 String nombreImagen = Paths.get(imagenPart.getSubmittedFileName()).getFileName().toString();
-                                System.out.println("Nombre de la imagen: " + nombreImagen);
 
                                 String rutaBase = "C:/uploads";
                                 File uploads = new File(rutaBase);
-                                System.out.println("Ruta de carga definida: " + uploads.getAbsolutePath());
 
                                 if (!uploads.exists()) {
                                     boolean dirCreated = uploads.mkdirs();
-                                    System.out.println("¿Directorio creado? " + dirCreated);
                                 }
-
                                 // Guardar la imagen en la carpeta de carga manualmente
                                 File file = new File(uploads, nombreImagen);
-                                System.out.println("Ruta completa para guardar la imagen: " + file.getAbsolutePath());
 
                                 try (InputStream input = imagenPart.getInputStream(); FileOutputStream output = new FileOutputStream(file)) {
                                     byte[] buffer = new byte[1024];
@@ -243,9 +284,6 @@ public class Manejador extends HttpServlet {
                                     }
                                 }
                                 imagen = nombreImagen;
-                                System.out.println("Imagen guardada: " + imagen);
-                            } else {
-                                System.out.println("No se ha recibido ninguna imagen o el tamaño es 0.");
                             }
 
                             Publicaciones nuevaPublicacion = new Publicaciones();
@@ -255,13 +293,16 @@ public class Manejador extends HttpServlet {
                             nuevaPublicacion.setCreatedAt(new Date());
                             nuevaPublicacion.setUpdatedAt(new Date());
 
-                            usuario = usersF.find(usuarioId);
+                            Users usuario = usersF.find(usuarioId);
                             nuevaPublicacion.setUserId(usuario);
-
                             publicacionesF.create(nuevaPublicacion);
-                            System.out.println("Publicación creada con éxito.");
 
-                            url = request.getContextPath() + "/vista/layouts/dashboard.jsp";
+                            // Obtener todas las publicaciones del usuario desde la base de datos
+                            List<Publicaciones> publicacionesUsuario = publicacionesF.obtenerPublicacionesPorUsuario(usuarioId);
+                            request.getSession().setAttribute("publicaciones", publicacionesUsuario);
+
+                            // Redirigir a edit.jsp después de la creación exitosa
+                            url = request.getContextPath() + "/vista/publicaciones/edit.jsp";
                             response.sendRedirect(url);
                             return;
 
@@ -271,11 +312,6 @@ public class Manejador extends HttpServlet {
                             url = "/vista/publicaciones/create.jsp";
                             request.getRequestDispatcher(url).forward(request, response);
 
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            request.setAttribute("error", "Hubo un problema al guardar la publicación. " + e.getMessage());
-                            url = "/vista/publicaciones/create.jsp";
-                            request.getRequestDispatcher(url).forward(request, response);
                         }
                     }
                     break;
@@ -296,6 +332,24 @@ public class Manejador extends HttpServlet {
                             request.getSession().setAttribute("bloqueado", usuarioLogin.getBloqueado());
                             request.getSession().setAttribute("es_publicador", usuarioLogin.getEsPublicador());
                             request.getSession().setAttribute("user", usuarioLogin);
+
+                            // Obtener y guardar en sesión las publicaciones basadas en el rol del usuario
+                            List<Publicaciones> publicaciones;
+                            if (usuarioLogin.getEsAdministrador()) {
+                                // Si el usuario es administrador, obtiene todas las publicaciones
+                                publicaciones = publicacionesF.obtenerTodasLasPublicaciones();
+                            } else {
+                                // Si es un usuario normal, obtiene solo sus publicaciones
+                                publicaciones = publicacionesF.obtenerPublicacionesPorUsuario(usuarioLogin.getId());
+                            }
+                            request.getSession().setAttribute("publicaciones", publicaciones);
+
+                            // Obtener y guardar los usuarios en la sesión si es administrador
+                            if (usuarioLogin.getEsAdministrador()) {
+                                List<Users> usuarios = usersF.obtenerTodasLosUsers();
+                                request.getSession().setAttribute("usuarios", usuarios);
+                            }
+
                             url = "/vista/layouts/dashboard.jsp";
                         } else {
                             request.setAttribute("error", "Credenciales incorrectas.");
@@ -357,7 +411,6 @@ public class Manejador extends HttpServlet {
 
                     if (usuarioAdmin3 != null && usuarioAdmin3.getEsAdministrador()) {
                         String usuarioIdStr = request.getParameter("usuarioId");
-                        System.out.println("ID de usuario a aceptar: " + usuarioIdStr);
                         try {
                             Long usuarioId2 = Long.parseLong(usuarioIdStr);
                             Users usuario2 = em.find(Users.class, usuarioId2);
@@ -372,12 +425,10 @@ public class Manejador extends HttpServlet {
                                 response.getWriter().write("Usuario no encontrado.");
                             }
                         } catch (NumberFormatException e) {
-                            System.out.println("Error al parsear el ID de usuario: " + e.getMessage());
                             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                             response.getWriter().write("ID de usuario inválido.");
                         }
                     } else {
-                        System.out.println("El usuario no es administrador o no está autenticado.");
                         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                         response.getWriter().write("No tiene permisos de administrador.");
                     }

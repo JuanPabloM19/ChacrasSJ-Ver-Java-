@@ -21,10 +21,6 @@
             <div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
                 <h2 class="text-2xl font-bold text-center">Crear nueva publicación</h2>
 
-                <c:if test="${not empty error}">
-                    <p class="text-red-500 text-center mt-2">${error}</p>
-                </c:if>
-
                 <form action="${pageContext.request.contextPath}/CrearPublicacion" method="POST" enctype="multipart/form-data" class="mt-4">
                     <!-- Título -->
                     <div class="mt-4">

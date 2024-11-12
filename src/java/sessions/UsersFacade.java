@@ -41,10 +41,6 @@ public class UsersFacade extends AbstractFacade<Users> {
         }
     }
 
-    public List<Users> findUsuariosNoAceptados() {
-        return em.createQuery("SELECT u FROM Users u WHERE u.aceptado = false", Users.class).getResultList();
-    }
-
     public List<Users> findUsuariosBloqueados() {
         return em.createQuery("SELECT u FROM Users u WHERE u.bloqueado = true", Users.class)
                 .getResultList();
@@ -52,7 +48,7 @@ public class UsersFacade extends AbstractFacade<Users> {
 
     public boolean cambiarContrasena(Long userId, String nuevaContrasena) {
         try {
-            Users user = em.find(Users.class, userId); 
+            Users user = em.find(Users.class, userId);
             if (user != null) {
                 user.setPassword(nuevaContrasena);
                 em.merge(user);
@@ -63,4 +59,21 @@ public class UsersFacade extends AbstractFacade<Users> {
         }
         return false;
     }
+
+    public void eliminarUsuario(Long id) {
+        Users usuario = em.find(Users.class, id);
+        if (usuario != null) {
+            em.remove(usuario);
+            em.flush();  // Sincroniza la eliminación con la base de datos
+            em.clear();  // Limpia el contexto de persistencia para evitar usar datos obsoletos
+        }
+    }
+
+    public List<Users> obtenerTodasLosUsers() {
+        em.clear(); // Limpiar el contexto de persistencia antes de obtener los datos
+        return em.createQuery("SELECT u FROM Users u", Users.class)
+                .setHint("javax.persistence.cache.storeMode", "REFRESH") // Evita usar caché obsoleta
+                .getResultList();
+    }
+
 }

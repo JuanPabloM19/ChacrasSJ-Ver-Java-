@@ -7,8 +7,6 @@ package sessions;
 import entidades.Publicaciones;
 import entidades.Users;
 import jakarta.ejb.Stateless;
-import jakarta.ejb.TransactionAttribute;
-import jakarta.ejb.TransactionAttributeType;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -34,22 +32,9 @@ public class PublicacionesFacade extends AbstractFacade<Publicaciones> {
         super(Publicaciones.class);
     }
 
-    @TransactionAttribute(TransactionAttributeType.REQUIRED)
-    public void createPublicacionF(Publicaciones publicacion) {
-        if (publicacion == null) {
-            throw new IllegalArgumentException("La publicación no puede ser nula");
-        }
-        try {
-            em.persist(publicacion);
-        } catch (Exception e) {
-            System.err.println("Error persisting publication: " + e.getMessage());
-            throw e;
-        }
-    }
-
     public List<Publicaciones> findUltimasPublicaciones() {
         TypedQuery<Publicaciones> query = em.createQuery("SELECT p FROM Publicaciones p", Publicaciones.class);
-        query.setMaxResults(10); 
+        query.setMaxResults(10);
         return query.getResultList();
     }
 
@@ -61,10 +46,6 @@ public class PublicacionesFacade extends AbstractFacade<Publicaciones> {
 
     public List<Publicaciones> obtenerTodasLasPublicaciones() {
         return em.createQuery("SELECT p FROM Publicaciones p", Publicaciones.class).getResultList();
-    }
-
-    public List<Publicaciones> findAllPublicaciones() {
-        return em.createNamedQuery("Publicaciones.findAll", Publicaciones.class).getResultList();
     }
 
     public void create(Publicaciones publicaciones) {
